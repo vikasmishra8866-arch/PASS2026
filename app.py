@@ -24,12 +24,11 @@ st.markdown("""
     color:white;
 }
 
-/* Remove Streamlit Default Space */
 .block-container{
     padding-top:2rem;
 }
 
-/* Title */
+/* ================= TITLE ================= */
 
 .main-title{
     text-align:center;
@@ -49,7 +48,7 @@ st.markdown("""
     font-size:18px;
 }
 
-/* Form Card */
+/* ================= FORM CARD ================= */
 
 .glass-card{
     background:rgba(255,255,255,0.06);
@@ -60,7 +59,7 @@ st.markdown("""
     box-shadow:0 0 50px rgba(168,85,247,0.18);
 }
 
-/* Payment Card */
+/* ================= PAYMENT CARD ================= */
 
 .payment-card{
     background:rgba(255,255,255,0.08);
@@ -73,7 +72,7 @@ st.markdown("""
     margin-top:30px;
 }
 
-/* QR Box */
+/* ================= QR BOX ================= */
 
 .qr-box{
     background:white;
@@ -84,16 +83,16 @@ st.markdown("""
     box-shadow:0 10px 40px rgba(0,0,0,0.35);
 }
 
-/* Amount */
+/* ================= AMOUNT ================= */
 
 .amount-text{
-    font-size:18px;
+    font-size:22px;
     color:#cbd5e1;
     margin-top:24px;
 }
 
 .price{
-    font-size:64px;
+    font-size:68px;
     font-weight:900;
     background:linear-gradient(to right,#a855f7,#06b6d4);
     -webkit-background-clip:text;
@@ -101,15 +100,15 @@ st.markdown("""
     margin-top:5px;
 }
 
-/* Footer */
+/* ================= FOOTER ================= */
 
 .footer-text{
     margin-top:30px;
     color:#94a3b8;
-    font-size:14px;
+    font-size:16px;
 }
 
-/* Button */
+/* ================= BUTTON ================= */
 
 .stButton>button{
     width:100%;
@@ -128,7 +127,7 @@ st.markdown("""
     box-shadow:0 0 30px rgba(168,85,247,0.45);
 }
 
-/* Inputs */
+/* ================= INPUTS ================= */
 
 .stTextInput input{
     border-radius:16px !important;
@@ -203,7 +202,8 @@ if generate:
         f"&cu=INR"
     )
 
-    # QR Code
+    # ================= QR =================
+
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -219,7 +219,7 @@ if generate:
         back_color="white"
     ).convert("RGB")
 
-    # ================= UI CARD =================
+    # ================= WEBSITE CARD =================
 
     st.markdown(
         "<div class='payment-card'>",
@@ -284,20 +284,20 @@ if generate:
 
     draw = ImageDraw.Draw(card)
 
-    # Gradient Background
+    # ================= PREMIUM BACKGROUND =================
 
     for y in range(card_height):
 
         r = int(5 + (y / card_height) * 35)
         g = int(8 + (y / card_height) * 20)
-        b = int(22 + (y / card_height) * 60)
+        b = int(22 + (y / card_height) * 65)
 
         draw.line(
             [(0, y), (card_width, y)],
             fill=(r, g, b)
         )
 
-    # Glow Layer
+    # ================= GLOW EFFECT =================
 
     glow = Image.new(
         "RGBA",
@@ -311,11 +311,11 @@ if generate:
         [(70, 70), (1130, 1730)],
         radius=60,
         outline=(0, 255, 255, 180),
-        width=10
+        width=12
     )
 
     glow = glow.filter(
-        ImageFilter.GaussianBlur(28)
+        ImageFilter.GaussianBlur(30)
     )
 
     card.paste(
@@ -326,7 +326,7 @@ if generate:
 
     draw = ImageDraw.Draw(card)
 
-    # Main Card
+    # ================= MAIN CARD =================
 
     draw.rounded_rectangle(
         [(70, 70), (1130, 1730)],
@@ -336,29 +336,53 @@ if generate:
         width=5
     )
 
-    # Fonts
+    # ================= FONTS =================
 
-    title_font = ImageFont.load_default()
-    body_font = ImageFont.load_default()
-    amount_font = ImageFont.load_default()
+    try:
 
-    # Header
+        title_font = ImageFont.truetype("arial.ttf", 54)
+
+        subtitle_font = ImageFont.truetype("arial.ttf", 44)
+
+        amount_label_font = ImageFont.truetype("arial.ttf", 40)
+
+        amount_font = ImageFont.truetype("arial.ttf", 90)
+
+        body_font = ImageFont.truetype("arial.ttf", 34)
+
+        footer_font = ImageFont.truetype("arial.ttf", 34)
+
+    except:
+
+        title_font = ImageFont.load_default()
+
+        subtitle_font = ImageFont.load_default()
+
+        amount_label_font = ImageFont.load_default()
+
+        amount_font = ImageFont.load_default()
+
+        body_font = ImageFont.load_default()
+
+        footer_font = ImageFont.load_default()
+
+    # ================= HEADER =================
 
     draw.text(
-        (350, 130),
+        (250, 120),
         "SCAN FOR PAYMENT",
         fill=(255, 255, 255),
         font=title_font
     )
 
     draw.text(
-        (420, 180),
+        (360, 195),
         "ANY UPI APP",
         fill=(0, 255, 255),
-        font=title_font
+        font=subtitle_font
     )
 
-    # QR Box
+    # ================= QR BOX =================
 
     draw.rounded_rectangle(
         [(220, 320), (980, 1080)],
@@ -373,43 +397,43 @@ if generate:
         (290, 390)
     )
 
-    # Amount Label
+    # ================= AMOUNT LABEL =================
 
     draw.text(
-        (480, 1150),
+        (410, 1155),
         "Amount To Pay",
         fill=(180, 180, 180),
-        font=body_font
+        font=amount_label_font
     )
 
-    # Amount
+    # ================= AMOUNT =================
 
     draw.text(
-        (530, 1230),
+        (430, 1240),
         f"₹{amount}",
         fill=(170, 85, 255),
         font=amount_font
     )
 
-    # UPI BOX
+    # ================= UPI BOX =================
 
     draw.rounded_rectangle(
-        [(170, 1380), (1030, 1470)],
+        [(150, 1390), (1050, 1495)],
         radius=30,
         fill=(30, 41, 59)
     )
 
     draw.text(
-        (240, 1415),
+        (210, 1425),
         final_upi,
         fill=(255, 255, 255),
         font=body_font
     )
 
-    # Remark BOX
+    # ================= REMARK BOX =================
 
     draw.rounded_rectangle(
-        [(170, 1510), (1030, 1600)],
+        [(150, 1530), (1050, 1635)],
         radius=30,
         fill=(30, 41, 59)
     )
@@ -421,22 +445,22 @@ if generate:
     )
 
     draw.text(
-        (240, 1545),
+        (210, 1565),
         remark_text,
         fill=(220, 220, 220),
         font=body_font
     )
 
-    # Footer
+    # ================= FOOTER =================
 
     draw.text(
-        (430, 1665),
+        (360, 1685),
         "SECURE UPI GATEWAY",
         fill=(0, 255, 200),
-        font=body_font
+        font=footer_font
     )
 
-    # Save Final Card
+    # ================= SAVE CARD =================
 
     card_buffer = BytesIO()
 
@@ -447,7 +471,7 @@ if generate:
 
     card_buffer.seek(0)
 
-    # Download Button
+    # ================= DOWNLOAD BUTTON =================
 
     st.download_button(
         label="⬇ Download Premium UPI Card",
