@@ -1,171 +1,185 @@
 import streamlit as st
-import io
-import time
-from pikepdf import Pdf, PasswordError
+import qrcode
+from PIL import Image
+from io import BytesIO
+import base64
 
-# Page Configuration - Premium Look ke liye
 st.set_page_config(
-    page_title="Vikas Mishra | Pro PDF Tools",
-    page_icon="🔐",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    page_title="Premium UPI QR Generator",
+    page_icon="💎",
+    layout="centered"
 )
 
-# Custom CSS for Professional Design & Visibility
+# ---------- PREMIUM CSS ----------
+
 st.markdown("""
-    <style>
-    /* Main Background and Text Visibility */
-    .stApp {
-        background-color: #0e1117;
-        color: #e0e0e0;
-    }
-    
-    /* Sidebar Styling */
-    section[data-testid="stSidebar"] {
-        background-color: #161b22 !important;
-        border-right: 1px solid #30363d;
-    }
-    
-    /* Headers Styling */
-    h1, h2, h3 {
-        color: #58a6ff !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    /* Footer/Credit Styling */
-    .footer-text {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        font-size: 14px;
-        color: #8b949e;
-    }
-    
-    .credit-link {
-        color: #58a6ff !important;
-        text-decoration: underline !important;
-        font-weight: bold;
-        font-size: 16px;
-    }
+<style>
 
-    /* Professional Button Styling */
-    .stButton>button {
-        width: 100%;
-        border-radius: 8px;
-        background-color: #238636;
-        color: white;
-        border: none;
-        padding: 10px;
-        transition: 0.3s;
-    }
-    
-    .stButton>button:hover {
-        background-color: #2ea043;
-        border: none;
-        color: white;
-    }
+.stApp {
+    background: linear-gradient(135deg,#050816,#0f172a,#111827);
+    color: white;
+}
 
-    /* Input Box Visibility */
-    .stTextInput>div>div>input {
-        background-color: #0d1117;
-        color: white;
-        border: 1px solid #30363d;
-    }
-    
-    /* Status Box */
-    .success-box {
-        padding: 20px;
-        background-color: rgba(35, 134, 54, 0.15);
-        border: 1px solid #238636;
-        border-radius: 10px;
-        color: #3fb950;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+.main-title {
+    text-align:center;
+    font-size:42px;
+    font-weight:800;
+    background: linear-gradient(to right,#a855f7,#06b6d4);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin-bottom:10px;
+}
 
-# --- SIDEBAR DESIGN ---
-with st.sidebar:
-    st.markdown("## 🛠️ Dashboard Settings")
-    st.divider()
-    
-    st.info("Yeh tool protected PDF files se password hatane ke liye banaya gaya hai.")
-    
-    # Custom Sidebar Credit (As per request)
-    st.markdown("<br><br>" * 5, unsafe_allow_html=True)
-    st.markdown("""
-        <div style='text-align: center;'>
-            <p style='margin-bottom: 0; color: #8b949e;'>Designed & Crafted by</p>
-            <p class='credit-link'><u>Vikas Mishra</u></p>
-        </div>
-    """, unsafe_allow_html=True)
+.subtitle {
+    text-align:center;
+    color:#94a3b8;
+    margin-bottom:40px;
+}
 
-# --- MAIN CONTENT ---
-st.title("🔐 Premium PDF Pass-Crack Dashboard")
-st.write("Ab aap apni password-protected PDF files ko bina kisi rukawat ke unlock kar sakte hain.")
+.glass-card {
+    background: rgba(255,255,255,0.06);
+    padding:30px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    box-shadow:0 0 40px rgba(168,85,247,0.2);
+}
 
-# Layout Columns
-col1, col2 = st.columns([2, 1])
+.payment-card {
+    background: rgba(255,255,255,0.08);
+    padding:35px;
+    border-radius:35px;
+    border:1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(25px);
+    box-shadow:0 0 60px rgba(6,182,212,0.2);
+    text-align:center;
+    margin-top:30px;
+}
 
-with col1:
-    st.markdown("### 📤 Upload Protected PDF")
-    uploaded_file = st.file_uploader("Apni file yahan drag karein ya browse karein", type=["pdf"])
-    
-    password = st.text_input("File ka Password darj karein:", type="password", help="Agar aapko password pata hai to yahan likhein.")
+.amount-text {
+    font-size:18px;
+    color:#cbd5e1;
+    margin-top:20px;
+}
 
-with col2:
-    st.markdown("### 📝 Instruction Box")
-    st.info("""
-    1. Protected PDF file upload karein.
-    2. Sahi password enter karein.
-    3. 'Remove Security' button par click karein.
-    4. Unlocked file turant download karein.
-    """)
+.price {
+    font-size:54px;
+    font-weight:800;
+    background: linear-gradient(to right,#a855f7,#06b6d4);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
 
-st.divider()
+.footer-text {
+    margin-top:25px;
+    color:#94a3b8;
+    font-size:14px;
+}
 
-if uploaded_file is not None:
-    if st.button("🚀 Process & Remove Security"):
-        if not password:
-            st.error("Kripya password enter karein!")
-        else:
-            with st.spinner("Processing... Security layers hataai ja rahi hain..."):
-                try:
-                    # Reading the PDF
-                    file_bytes = uploaded_file.read()
-                    
-                    # Unlocking logic using pikepdf
-                    with Pdf.open(io.BytesIO(file_bytes), password=password) as pdf:
-                        # Save the decrypted PDF
-                        output = io.BytesIO()
-                        pdf.save(output)
-                        output.seek(0)
-                        
-                        time.sleep(1.5) # For professional feel/loading
-                        
-                        st.markdown("""
-                            <div class='success-box'>
-                                ✅ <b>Success!</b> Aapki PDF file unlock ho gayi hai. Neeche diye gaye button se download karein.
-                            </div>
-                        """, unsafe_allow_html=True)
-                        
-                        st.download_button(
-                            label="📥 Download Unlocked PDF",
-                            data=output,
-                            file_name=f"Unlocked_{uploaded_file.name}",
-                            mime="application/pdf"
-                        )
-                
-                except PasswordError:
-                    st.error("❌ Galat Password! Kripya sahi password try karein.")
-                except Exception as e:
-                    st.error(f"❌ Kuch gadbad hui: {str(e)}")
+.qr-box {
+    background:white;
+    padding:20px;
+    border-radius:30px;
+    display:inline-block;
+    margin-top:20px;
+}
 
-# Fallback UI for Visibility check
-if not uploaded_file:
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.image("https://www.freeiconspng.com/uploads/pdf-icon-png-pdf-extension-file-format-icon-24.png", width=100)
-    st.caption("Waiting for file upload...")
+.stButton>button {
+    width:100%;
+    border:none;
+    border-radius:18px;
+    background: linear-gradient(to right,#9333ea,#06b6d4);
+    color:white;
+    font-size:18px;
+    font-weight:700;
+    padding:14px;
+    transition:0.3s;
+}
 
-# Professional Footer Line
-st.markdown("---")
-st.markdown("<p style='text-align: center; color: #484f58;'>© 2024 Vikas Mishra Pro Dashboard | Secure & Private</p>", unsafe_allow_html=True)
+.stButton>button:hover {
+    transform:scale(1.02);
+    box-shadow:0 0 25px rgba(168,85,247,0.5);
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- TITLE ----------
+
+st.markdown("<div class='main-title'>Premium UPI QR Generator</div>", unsafe_allow_html=True)
+
+st.markdown("<div class='subtitle'>Luxury Secure Payment Gateway</div>", unsafe_allow_html=True)
+
+# ---------- FORM ----------
+
+upi_options = [
+    "9696159863-2@ibl",
+    "9696159863-3@ybl",
+    "9696159863@phonepe"
+]
+
+st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+
+selected_upi = st.selectbox("Select UPI ID", upi_options)
+
+custom_upi = st.text_input("Custom UPI ID")
+
+amount = st.text_input("Amount")
+
+remark = st.text_input("Note / Remark")
+
+generate = st.button("Generate Premium QR")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# ---------- QR GENERATION ----------
+
+if generate:
+
+    final_upi = custom_upi if custom_upi else selected_upi
+
+    upi_link = f"upi://pay?pa={final_upi}&pn=Vinay&am={amount}&tn={remark}&cu=INR"
+
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=10,
+        border=2
+    )
+
+    qr.add_data(upi_link)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+
+    st.markdown("<div class='payment-card'>", unsafe_allow_html=True)
+
+    st.markdown("### ✨ Scan For Payment Any UPI App")
+
+    st.markdown("<div class='qr-box'>", unsafe_allow_html=True)
+
+    st.image(img, width=280)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='amount-text'>Amount To Pay</div>", unsafe_allow_html=True)
+
+    st.markdown(f"<div class='price'>₹{amount}</div>", unsafe_allow_html=True)
+
+    st.markdown(f"#### {final_upi}")
+
+    if remark:
+        st.markdown(f"📝 {remark}")
+
+    st.markdown("<div class='footer-text'>🔒 Secure UPI Gateway</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.download_button(
+        label="⬇ Download QR Code",
+        data=buffered.getvalue(),
+        file_name="premium_upi_qr.png",
+        mime="image/png"
+    )
