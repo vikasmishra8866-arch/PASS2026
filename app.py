@@ -149,8 +149,7 @@ if generate:
     qr.add_data(upi_link)
     qr.make(fit=True)
 
-    img = qr.make_image(fill_color="black", back_color="white")
-
+    img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
     buffered = BytesIO()
     img.save(buffered, format="PNG")
 
