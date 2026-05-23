@@ -486,163 +486,221 @@ if generate:
         scrolling=False
     )
 
-    # ================= DOWNLOAD QR =================
+    # ================= PREMIUM DOWNLOAD BUTTON =================
 
-        # ================= DOWNLOAD PREMIUM CARD =================
+download_html = f"""
 
-    html_for_image = f"""
-    <html>
-    <head>
-    <style>
+<html>
 
-    body{{
-        margin:0;
-        padding:0;
-        background:transparent;
-        font-family:Poppins,sans-serif;
-    }}
+<head>
 
-    .qr-card{{
-        width:430px;
-        border-radius:34px;
-        overflow:hidden;
-        background:
-        linear-gradient(145deg,#0b1120,#131c31,#1e1b4b);
-        border:1px solid rgba(255,255,255,0.08);
-        box-shadow:
-        0 0 40px rgba(139,92,246,0.35),
-        0 0 80px rgba(6,182,212,0.15);
-    }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    .card-top{{
-        padding:40px 25px 30px;
-        text-align:center;
-        position:relative;
-        background:
-        radial-gradient(circle at top left,#8b5cf655,transparent 35%),
-        radial-gradient(circle at bottom right,#06b6d455,transparent 35%);
-    }}
+<style>
 
-    .scan-text{{
-        font-size:30px;
-        font-weight:800;
-        color:white;
-        letter-spacing:1px;
-    }}
+body{{
+    margin:0;
+    padding:0;
+    background:transparent;
+}}
 
-    .sub-text{{
-        margin-top:12px;
-        color:#67e8f9;
-        font-size:16px;
-        font-weight:500;
-    }}
+.download-btn{{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+    color:white;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:
+    0 0 20px rgba(139,92,246,0.5),
+    0 0 40px rgba(6,182,212,0.2);
+}}
 
-    .qr-box{{
-        margin-top:30px;
-        background:white;
-        padding:18px;
-        border-radius:28px;
-        display:inline-block;
-        border:4px solid #8b5cf6;
-        box-shadow:
-        0 0 25px rgba(139,92,246,0.6),
-        0 0 50px rgba(6,182,212,0.25);
-    }}
+.download-btn:hover{{
+    transform:scale(1.02);
+    box-shadow:
+    0 0 35px rgba(139,92,246,0.8),
+    0 0 60px rgba(6,182,212,0.4);
+}}
 
-    .amount-label{{
-        margin-top:35px;
-        color:#94a3b8;
-        font-size:18px;
-        font-weight:500;
-    }}
+.hidden-card{{
+    position:absolute;
+    left:-99999px;
+    top:-99999px;
+}}
 
-    .amount{{
-        font-size:54px;
-        font-weight:800;
-        color:white;
-        margin-top:8px;
-    }}
+.qr-card{{
+    width:430px;
+    border-radius:34px;
+    overflow:hidden;
+    background:
+    linear-gradient(145deg,#0b1120,#131c31,#1e1b4b);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:
+    0 0 40px rgba(139,92,246,0.35),
+    0 0 80px rgba(6,182,212,0.15);
+    font-family:Poppins,sans-serif;
+}}
 
-    .upi-id{{
-        margin-top:22px;
-        font-size:18px;
-        color:#e2e8f0;
-        word-break:break-word;
-    }}
+.card-top{{
+    padding:40px 25px 30px;
+    text-align:center;
+    background:
+    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+    radial-gradient(circle at bottom right,#06b6d455,transparent 35%);
+}}
 
-    .note{{
-        margin-top:12px;
-        color:#94a3b8;
-        font-size:16px;
-    }}
+.scan-text{{
+    font-size:30px;
+    font-weight:800;
+    color:white;
+}}
 
-    .card-footer{{
-        background:#0f172a;
-        text-align:center;
-        padding:22px;
-        color:#67e8f9;
-        font-size:16px;
-        font-weight:600;
-    }}
+.sub-text{{
+    margin-top:12px;
+    color:#67e8f9;
+    font-size:16px;
+}}
 
-    </style>
-    </head>
+.qr-box{{
+    margin-top:30px;
+    background:white;
+    padding:18px;
+    border-radius:28px;
+    display:inline-block;
+    border:4px solid #8b5cf6;
+}}
 
-    <body>
+.amount-label{{
+    margin-top:35px;
+    color:#94a3b8;
+    font-size:18px;
+}}
 
-    <div class="qr-card">
+.amount{{
+    font-size:54px;
+    font-weight:800;
+    color:white;
+    margin-top:8px;
+}}
 
-        <div class="card-top">
+.upi-id{{
+    margin-top:22px;
+    font-size:18px;
+    color:#e2e8f0;
+}}
 
-            <div class="scan-text">
-                SCAN FOR PAYMENT
-            </div>
+.note{{
+    margin-top:12px;
+    color:#94a3b8;
+    font-size:16px;
+}}
 
-            <div class="sub-text">
-                USING ANY UPI APP
-            </div>
+.card-footer{{
+    background:#0f172a;
+    text-align:center;
+    padding:22px;
+    color:#67e8f9;
+    font-size:16px;
+    font-weight:600;
+}}
 
-            <div class="qr-box">
+</style>
 
-                <img
-                    src="data:image/png;base64,{qr_base64}"
-                    width="260"
-                >
+</head>
 
-            </div>
+<body>
 
-            <div class="amount-label">
-                AMOUNT TO PAY
-            </div>
+<button class="download-btn" onclick="downloadCard()">
+⬇ Download Premium UPI Card
+</button>
 
-            <div class="amount">
-                ₹{amount:,.2f}
-            </div>
+<div class="hidden-card">
 
-            <div class="upi-id">
-                {final_upi}
-            </div>
+<div class="qr-card" id="captureCard">
 
-            <div class="note">
-                {note}
-            </div>
+    <div class="card-top">
+
+        <div class="scan-text">
+            SCAN FOR PAYMENT
+        </div>
+
+        <div class="sub-text">
+            USING ANY UPI APP
+        </div>
+
+        <div class="qr-box">
+
+            <img
+                src="data:image/png;base64,{qr_base64}"
+                width="260"
+            >
 
         </div>
 
-        <div class="card-footer">
-            🔒 SECURE UPI GATEWAY
+        <div class="amount-label">
+            AMOUNT TO PAY
+        </div>
+
+        <div class="amount">
+            ₹{amount:,.2f}
+        </div>
+
+        <div class="upi-id">
+            {final_upi}
+        </div>
+
+        <div class="note">
+            {note}
         </div>
 
     </div>
 
-    </body>
-    </html>
-    """
+    <div class="card-footer">
+        🔒 SECURE UPI GATEWAY
+    </div>
 
-    st.download_button(
-        label="⬇ Download Premium UPI Card",
-        data=html_for_image,
-        file_name="premium_upi_card.html",
-        mime="text/html",
-        use_container_width=True
-    )
+</div>
+
+</div>
+
+<script>
+
+function downloadCard() {{
+
+    const card = document.getElementById("captureCard");
+
+    html2canvas(card, {{
+        scale: 4,
+        useCORS: true,
+        backgroundColor: null
+    }}).then(canvas => {{
+
+        const link = document.createElement("a");
+
+        link.download = "premium_upi_card.png";
+
+        link.href = canvas.toDataURL("image/png");
+
+        link.click();
+
+    }});
+
+}}
+
+</script>
+
+</body>
+
+</html>
+
+"""
+
+components.html(
+    download_html,
+    height=90
+)
