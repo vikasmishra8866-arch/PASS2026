@@ -488,59 +488,161 @@ if generate:
 
     # ================= DOWNLOAD QR =================
 
-    import streamlit.components.v1 as components
+        # ================= DOWNLOAD PREMIUM CARD =================
 
-download_html = f"""
+    html_for_image = f"""
+    <html>
+    <head>
+    <style>
 
-<script>
+    body{{
+        margin:0;
+        padding:0;
+        background:transparent;
+        font-family:Poppins,sans-serif;
+    }}
 
-function downloadCard() {{
+    .qr-card{{
+        width:430px;
+        border-radius:34px;
+        overflow:hidden;
+        background:
+        linear-gradient(145deg,#0b1120,#131c31,#1e1b4b);
+        border:1px solid rgba(255,255,255,0.08);
+        box-shadow:
+        0 0 40px rgba(139,92,246,0.35),
+        0 0 80px rgba(6,182,212,0.15);
+    }}
 
-    const card = document.querySelector('.qr-card');
+    .card-top{{
+        padding:40px 25px 30px;
+        text-align:center;
+        position:relative;
+        background:
+        radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+        radial-gradient(circle at bottom right,#06b6d455,transparent 35%);
+    }}
 
-    html2canvas(card, {{
-        scale: 3,
-        useCORS: true,
-        backgroundColor: null
-    }}).then(canvas => {{
+    .scan-text{{
+        font-size:30px;
+        font-weight:800;
+        color:white;
+        letter-spacing:1px;
+    }}
 
-        const link = document.createElement('a');
+    .sub-text{{
+        margin-top:12px;
+        color:#67e8f9;
+        font-size:16px;
+        font-weight:500;
+    }}
 
-        link.download = 'premium_upi_card.png';
+    .qr-box{{
+        margin-top:30px;
+        background:white;
+        padding:18px;
+        border-radius:28px;
+        display:inline-block;
+        border:4px solid #8b5cf6;
+        box-shadow:
+        0 0 25px rgba(139,92,246,0.6),
+        0 0 50px rgba(6,182,212,0.25);
+    }}
 
-        link.href = canvas.toDataURL('image/png');
+    .amount-label{{
+        margin-top:35px;
+        color:#94a3b8;
+        font-size:18px;
+        font-weight:500;
+    }}
 
-        link.click();
+    .amount{{
+        font-size:54px;
+        font-weight:800;
+        color:white;
+        margin-top:8px;
+    }}
 
-    }});
+    .upi-id{{
+        margin-top:22px;
+        font-size:18px;
+        color:#e2e8f0;
+        word-break:break-word;
+    }}
 
-}}
+    .note{{
+        margin-top:12px;
+        color:#94a3b8;
+        font-size:16px;
+    }}
 
-</script>
+    .card-footer{{
+        background:#0f172a;
+        text-align:center;
+        padding:22px;
+        color:#67e8f9;
+        font-size:16px;
+        font-weight:600;
+    }}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    </style>
+    </head>
 
-<button
-onclick="downloadCard()"
-style="
-width:100%;
-margin-top:20px;
-padding:16px;
-border:none;
-border-radius:18px;
-background:linear-gradient(to right,#7c3aed,#06b6d4);
-color:white;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
-box-shadow:0 0 25px rgba(139,92,246,0.4);
-">
-⬇ Download Premium UPI Card
-</button>
+    <body>
 
-"""
+    <div class="qr-card">
 
-components.html(
-    download_html,
-    height=100
-)
+        <div class="card-top">
+
+            <div class="scan-text">
+                SCAN FOR PAYMENT
+            </div>
+
+            <div class="sub-text">
+                USING ANY UPI APP
+            </div>
+
+            <div class="qr-box">
+
+                <img
+                    src="data:image/png;base64,{qr_base64}"
+                    width="260"
+                >
+
+            </div>
+
+            <div class="amount-label">
+                AMOUNT TO PAY
+            </div>
+
+            <div class="amount">
+                ₹{amount:,.2f}
+            </div>
+
+            <div class="upi-id">
+                {final_upi}
+            </div>
+
+            <div class="note">
+                {note}
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+            🔒 SECURE UPI GATEWAY
+        </div>
+
+    </div>
+
+    </body>
+    </html>
+    """
+
+    st.download_button(
+        label="⬇ Download Premium UPI Card",
+        data=html_for_image,
+        file_name="premium_upi_card.html",
+        mime="text/html",
+        use_container_width=True
+    )
