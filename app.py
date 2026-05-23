@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import qrcode
 import base64
 from io import BytesIO
@@ -302,9 +303,125 @@ if generate:
         buffer.getvalue()
     ).decode()
 
-    # ================= PREMIUM CARD =================
+    # ================= PREMIUM CARD HTML =================
 
     card_html = f"""
+
+    <html>
+
+    <head>
+
+    <style>
+
+    body{{
+        margin:0;
+        padding:0;
+        background:transparent;
+        font-family:Poppins,sans-serif;
+    }}
+
+    .qr-card{{
+        width:430px;
+        margin:auto;
+        border-radius:34px;
+        overflow:hidden;
+        background:
+        linear-gradient(145deg,#0b1120,#131c31,#1e1b4b);
+        border:1px solid rgba(255,255,255,0.08);
+        box-shadow:
+        0 0 40px rgba(139,92,246,0.35),
+        0 0 80px rgba(6,182,212,0.15);
+    }}
+
+    .card-top{{
+        padding:40px 25px 30px;
+        text-align:center;
+        position:relative;
+    }}
+
+    .card-top:before{{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:
+        radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+        radial-gradient(circle at bottom right,#06b6d455,transparent 35%);
+        z-index:0;
+    }}
+
+    .card-content{{
+        position:relative;
+        z-index:1;
+    }}
+
+    .scan-text{{
+        font-size:30px;
+        font-weight:800;
+        color:white;
+        letter-spacing:1px;
+    }}
+
+    .sub-text{{
+        margin-top:12px;
+        color:#67e8f9;
+        font-size:16px;
+        font-weight:500;
+    }}
+
+    .qr-box{{
+        margin-top:30px;
+        background:white;
+        padding:18px;
+        border-radius:28px;
+        display:inline-block;
+        border:4px solid #8b5cf6;
+        box-shadow:
+        0 0 25px rgba(139,92,246,0.6),
+        0 0 50px rgba(6,182,212,0.25);
+    }}
+
+    .amount-label{{
+        margin-top:35px;
+        color:#94a3b8;
+        font-size:18px;
+        font-weight:500;
+    }}
+
+    .amount{{
+        font-size:54px;
+        font-weight:800;
+        color:white;
+        margin-top:8px;
+    }}
+
+    .upi-id{{
+        margin-top:22px;
+        font-size:18px;
+        color:#e2e8f0;
+        word-break:break-word;
+    }}
+
+    .note{{
+        margin-top:12px;
+        color:#94a3b8;
+        font-size:16px;
+    }}
+
+    .card-footer{{
+        background:#0f172a;
+        text-align:center;
+        padding:22px;
+        color:#67e8f9;
+        font-size:16px;
+        font-weight:600;
+        border-top:1px solid rgba(255,255,255,0.05);
+    }}
+
+    </style>
+
+    </head>
+
+    <body>
 
     <div class="qr-card">
 
@@ -355,11 +472,18 @@ if generate:
 
     </div>
 
+    </body>
+
+    </html>
+
     """
 
-    st.markdown(
+    # ================= SHOW HTML CARD =================
+
+    components.html(
         card_html,
-        unsafe_allow_html=True
+        height=760,
+        scrolling=False
     )
 
     # ================= DOWNLOAD QR =================
