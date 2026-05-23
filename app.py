@@ -4,19 +4,25 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import io
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="Premium UPI Card Generator", page_icon="💳", layout="centered")
+st.set_page_config(
+    page_title="Premium UPI Card Generator",
+    page_icon="💳",
+    layout="centered"
+)
 
 # --- UI CUSTOM CSS ---
 st.markdown("""
     <style>
-    .stApp { 
-        background: linear-gradient(135deg, #0a0e17, #131b2c); 
-        color: white; 
+
+    .stApp {
+        background: linear-gradient(135deg, #0a0e17, #131b2c);
+        color: white;
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
+
     .main-card {
         background: rgba(255, 255, 255, 0.03);
-        padding: 35px; 
+        padding: 35px;
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(15px);
@@ -26,49 +32,78 @@ st.markdown("""
         margin-left: auto;
         margin-right: auto;
     }
-    h1 { 
-        text-align: center; 
+
+    h1 {
+        text-align: center;
         font-weight: 800;
-        background: linear-gradient(to right, #8b5cf6, #06b6d4); 
-        -webkit-background-clip: text; 
-        -webkit-text-fill-color: transparent; 
+        background: linear-gradient(to right, #8b5cf6, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 25px;
     }
+
     .stImage {
         border-radius: 20px;
         margin-top: 15px;
     }
+
     </style>
 """, unsafe_allow_html=True)
 
-# Helper function to get centered coordinates for text safely
+# ================= TEXT CENTER FUNCTION =================
+
 def draw_centered_text(draw, canvas_w, y, text, font, fill):
+
     text_bbox = draw.textbbox((0, 0), text, font=font)
+
     text_w = text_bbox[2] - text_bbox[0]
+
     text_x = (canvas_w - text_w) // 2
-    draw.text((text_x, y), text, font=font, fill=fill)
+
+    draw.text(
+        (text_x, y),
+        text,
+        font=font,
+        fill=fill
+    )
+
+# ================= PREMIUM CARD FUNCTION =================
 
 def generate_premium_card(upi_id, amount, custom_note):
 
-    # Canvas Layout
+    # ================= CANVAS =================
+
     w, h = 600, 950
 
-    # ================= UNIQUE PREMIUM BACKGROUND =================
+    card = Image.new(
+        'RGB',
+        (w, h),
+        '#070b14'
+    )
 
-    card = Image.new('RGB', (w, h), '#070b14')
     draw = ImageDraw.Draw(card)
 
-    # Gradient Background
+    # ================= PREMIUM BACKGROUND =================
+
     for y in range(h):
 
         r = int(10 + (y / h) * 35)
         g = int(14 + (y / h) * 25)
         b = int(22 + (y / h) * 55)
 
-        draw.line([(0, y), (w, y)], fill=(r, g, b))
+        draw.line(
+            [(0, y), (w, y)],
+            fill=(r, g, b)
+        )
 
-    # Premium Glow Circles
-    glow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    # ================= GLOW EFFECT =================
+
+    glow_layer = Image.new(
+        "RGBA",
+        (w, h),
+        (0, 0, 0, 0)
+    )
+
     glow_draw = ImageDraw.Draw(glow_layer)
 
     glow_draw.ellipse(
@@ -81,9 +116,15 @@ def generate_premium_card(upi_id, amount, custom_note):
         fill=(6, 182, 212, 80)
     )
 
-    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(80))
+    glow_layer = glow_layer.filter(
+        ImageFilter.GaussianBlur(80)
+    )
 
-    card.paste(glow_layer, (0, 0), glow_layer)
+    card.paste(
+        glow_layer,
+        (0, 0),
+        glow_layer
+    )
 
     draw = ImageDraw.Draw(card)
 
@@ -105,36 +146,73 @@ def generate_premium_card(upi_id, amount, custom_note):
     # ================= PREMIUM FONT SYSTEM =================
 
     try:
-        # Premium Fonts
-        font_title = ImageFont.truetype("georgiab.ttf", 44)
 
-        font_subtitle = ImageFont.truetype("ariali.ttf", 24)
+        # SAME TEXT SIZES — ONLY PREMIUM STYLE
+        font_title = ImageFont.truetype(
+            "DejaVuSerif-Bold.ttf",
+            44
+        )
 
-        font_label = ImageFont.truetype("arial.ttf", 22)
+        font_subtitle = ImageFont.truetype(
+            "DejaVuSans.ttf",
+            24
+        )
 
-        font_amount = ImageFont.truetype("arialbd.ttf", 52)
+        font_label = ImageFont.truetype(
+            "DejaVuSans.ttf",
+            22
+        )
 
-        font_upi = ImageFont.truetype("arial.ttf", 28)
+        font_amount = ImageFont.truetype(
+            "DejaVuSans-Bold.ttf",
+            52
+        )
 
-        font_footer = ImageFont.truetype("ariali.ttf", 20)
+        font_upi = ImageFont.truetype(
+            "DejaVuSans.ttf",
+            28
+        )
 
-    except IOError:
+        font_footer = ImageFont.truetype(
+            "DejaVuSans.ttf",
+            20
+        )
+
+    except:
 
         try:
-            # Linux Fallback
-            font_title = ImageFont.truetype("LiberationSerif-Bold.ttf", 44)
 
-            font_subtitle = ImageFont.truetype("LiberationSans-Italic.ttf", 24)
+            font_title = ImageFont.truetype(
+                "LiberationSerif-Bold.ttf",
+                44
+            )
 
-            font_label = ImageFont.truetype("LiberationSans-Regular.ttf", 22)
+            font_subtitle = ImageFont.truetype(
+                "LiberationSans-Regular.ttf",
+                24
+            )
 
-            font_amount = ImageFont.truetype("LiberationSans-Bold.ttf", 52)
+            font_label = ImageFont.truetype(
+                "LiberationSans-Regular.ttf",
+                22
+            )
 
-            font_upi = ImageFont.truetype("LiberationSans-Regular.ttf", 28)
+            font_amount = ImageFont.truetype(
+                "LiberationSans-Bold.ttf",
+                52
+            )
 
-            font_footer = ImageFont.truetype("LiberationSans-Italic.ttf", 20)
+            font_upi = ImageFont.truetype(
+                "LiberationSans-Regular.ttf",
+                28
+            )
 
-        except IOError:
+            font_footer = ImageFont.truetype(
+                "LiberationSans-Regular.ttf",
+                20
+            )
+
+        except:
 
             font_title = ImageFont.load_default()
 
@@ -179,7 +257,14 @@ def generate_premium_card(upi_id, amount, custom_note):
 
     # ================= QR CODE =================
 
-    upi_url = f"upi://pay?pa={upi_id}&pn=UPI%20Payment&am={amount}&cu=INR&tn={custom_note}"
+    upi_url = (
+        f"upi://pay?"
+        f"pa={upi_id}"
+        f"&pn=UPI%20Payment"
+        f"&am={amount}"
+        f"&cu=INR"
+        f"&tn={custom_note}"
+    )
 
     qr = qrcode.QRCode(
         version=3,
@@ -192,7 +277,7 @@ def generate_premium_card(upi_id, amount, custom_note):
     qr.make(fit=True)
 
     qr_img = qr.make_image(
-        fill_color="#0f172a",
+        fill_color="#0b1120",
         back_color="white"
     ).convert('RGB')
 
@@ -200,49 +285,86 @@ def generate_premium_card(upi_id, amount, custom_note):
 
     bx, by = (w - qr_w) // 2, 310
 
-    # ================= PREMIUM SHADOW =================
+    # ================= PREMIUM QR GLOW =================
 
-    for offset in range(10, 0, -1):
+    glow_layer_qr = Image.new(
+        "RGBA",
+        (w, h),
+        (0, 0, 0, 0)
+    )
 
-        shadow_color = (
-            15 + offset * 4,
-            23 + offset * 2,
-            42 + offset * 2
-        )
+    glow_draw_qr = ImageDraw.Draw(glow_layer_qr)
 
-        draw.rounded_rectangle(
-            [
-                bx - 18 + offset,
-                by - 18 + offset,
-                bx + qr_w + 18 + offset,
-                by + qr_h + 18 + offset
-            ],
-            radius=24,
-            fill=shadow_color
-        )
+    glow_draw_qr.rounded_rectangle(
+        [
+            bx - 28,
+            by - 28,
+            bx + qr_w + 28,
+            by + qr_h + 28
+        ],
+        radius=34,
+        fill=(139, 92, 246, 110)
+    )
 
-    # ================= QR FRAME =================
-
-    draw.rounded_rectangle(
+    glow_draw_qr.rounded_rectangle(
         [
             bx - 18,
             by - 18,
             bx + qr_w + 18,
             by + qr_h + 18
         ],
-        radius=24,
-        outline='#8b5cf6',
-        fill='#ffffff',
-        width=4
+        radius=28,
+        fill=(6, 182, 212, 90)
     )
 
-    card.paste(qr_img, (bx, by))
+    glow_layer_qr = glow_layer_qr.filter(
+        ImageFilter.GaussianBlur(35)
+    )
+
+    card.paste(
+        glow_layer_qr,
+        (0, 0),
+        glow_layer_qr
+    )
+
+    draw = ImageDraw.Draw(card)
+
+    # ================= PREMIUM QR FRAME =================
+
+    draw.rounded_rectangle(
+        [
+            bx - 22,
+            by - 22,
+            bx + qr_w + 22,
+            by + qr_h + 22
+        ],
+        radius=28,
+        fill="#ffffff",
+        outline="#8b5cf6",
+        width=5
+    )
+
+    draw.rounded_rectangle(
+        [
+            bx - 10,
+            by - 10,
+            bx + qr_w + 10,
+            by + qr_h + 10
+        ],
+        radius=20,
+        outline="#06b6d4",
+        width=3
+    )
+
+    card.paste(
+        qr_img,
+        (bx, by)
+    )
 
     # ================= BOTTOM SECTION =================
 
     content_start_y = by + qr_h + 65
 
-    # Amount Label
     draw_centered_text(
         draw,
         w,
@@ -252,7 +374,6 @@ def generate_premium_card(upi_id, amount, custom_note):
         fill="#94a3b8"
     )
 
-    # Amount
     amount_str = f"{float(amount):,.2f}"
 
     draw_centered_text(
@@ -264,7 +385,6 @@ def generate_premium_card(upi_id, amount, custom_note):
         fill="#ffffff"
     )
 
-    # Divider
     divider_y = content_start_y + 145
 
     draw.line(
@@ -273,7 +393,6 @@ def generate_premium_card(upi_id, amount, custom_note):
         width=3
     )
 
-    # UPI ID
     upi_label_str = f"UPI ID: {upi_id}"
 
     draw_centered_text(
@@ -285,10 +404,13 @@ def generate_premium_card(upi_id, amount, custom_note):
         fill="#e2e8f0"
     )
 
-    # Note
     note_text = custom_note.strip() if custom_note else ""
 
-    note_label_str = f"Note: {note_text}" if note_text else "Note: N/A"
+    note_label_str = (
+        f"Note: {note_text}"
+        if note_text
+        else "Note: N/A"
+    )
 
     draw_centered_text(
         draw,
@@ -317,12 +439,19 @@ def generate_premium_card(upi_id, amount, custom_note):
 
     return card
 
-# --- APP UI ---
-st.markdown("<h1>Premium Payment Standee</h1>", unsafe_allow_html=True)
+# ================= APP UI =================
+
+st.markdown(
+    "<h1>Premium Payment Standee</h1>",
+    unsafe_allow_html=True
+)
 
 with st.container():
 
-    st.markdown('<div class="main-card">', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="main-card">',
+        unsafe_allow_html=True
+    )
 
     upi_suggestions = [
         "9696159863.wallet@phonepe",
@@ -339,7 +468,11 @@ with st.container():
         value=selected_upi
     )
 
-    final_upi = custom_upi if custom_upi else selected_upi
+    final_upi = (
+        custom_upi
+        if custom_upi
+        else selected_upi
+    )
 
     amount = st.number_input(
         "Amount (INR)",
@@ -364,15 +497,17 @@ with st.container():
             note
         )
 
-        col1, col2, col3 = st.columns([1,2,1])
+        col1, col2, col3 = st.columns([1, 2, 1])
 
         with col2:
+
             st.image(
                 final_image,
                 use_container_width=True
             )
 
-            # Download Button
+            # ================= DOWNLOAD =================
+
             img_buffer = io.BytesIO()
 
             final_image.save(
@@ -388,4 +523,7 @@ with st.container():
                 use_container_width=True
             )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(
+        '</div>',
+        unsafe_allow_html=True
+    )
