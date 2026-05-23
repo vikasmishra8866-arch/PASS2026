@@ -488,10 +488,59 @@ if generate:
 
     # ================= DOWNLOAD QR =================
 
-    st.download_button(
-        label="⬇ Download QR Image",
-        data=buffer.getvalue(),
-        file_name="premium_qr.png",
-        mime="image/png",
-        use_container_width=True
-    )
+    import streamlit.components.v1 as components
+
+download_html = f"""
+
+<script>
+
+function downloadCard() {{
+
+    const card = document.querySelector('.qr-card');
+
+    html2canvas(card, {{
+        scale: 3,
+        useCORS: true,
+        backgroundColor: null
+    }}).then(canvas => {{
+
+        const link = document.createElement('a');
+
+        link.download = 'premium_upi_card.png';
+
+        link.href = canvas.toDataURL('image/png');
+
+        link.click();
+
+    }});
+
+}}
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<button
+onclick="downloadCard()"
+style="
+width:100%;
+margin-top:20px;
+padding:16px;
+border:none;
+border-radius:18px;
+background:linear-gradient(to right,#7c3aed,#06b6d4);
+color:white;
+font-size:18px;
+font-weight:700;
+cursor:pointer;
+box-shadow:0 0 25px rgba(139,92,246,0.4);
+">
+⬇ Download Premium UPI Card
+</button>
+
+"""
+
+components.html(
+    download_html,
+    height=100
+)
