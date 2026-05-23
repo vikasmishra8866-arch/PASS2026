@@ -237,7 +237,7 @@ st.markdown('<div class="main-box">', unsafe_allow_html=True)
 upi_options = [
     "9696159863-2@ibl",
     "9696159863-3@ybl",
-    "9696159863@phonepe"
+    "9696159863.wallet@phonepe"
 ]
 
 selected_upi = st.selectbox(
